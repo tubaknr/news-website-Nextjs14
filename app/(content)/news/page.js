@@ -1,21 +1,16 @@
-"use client";
 // DUMMY_NEWS is not used anymore! we have backend!
 import NewsList from "@/components/news-list";
-import { useEffect, useState } from "react";
+import { getAllNews } from "@/lib/news";
 
 export default async function NewsPage(){
+    const news = await getAllNews();
    
-    const response = await fetch('http://localhost:8080/news');
-    if(!response.ok){
-        throw new Error("Failed to fetch data!");
-    }
+//     const response = await fetch('http://localhost:8080/news');
+//     if(!response.ok){
+//         throw new Error("Failed to fetch data!");
+//     }
 
-    const news = await response.json(); // promise döner --> await --> async
-
-    // let newsContent;
-    // if (news){ //doğru çekilebilmmiş ise
-    //     newsContent = <NewsList news={news} />
-    // }
+//     const news = await response.json(); // promise döner --> await --> async
 
     return(
         <>
