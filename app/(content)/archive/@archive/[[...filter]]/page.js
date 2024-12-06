@@ -8,7 +8,58 @@ import {
 } from "@/lib/news";
 import { Suspense } from "react";
 
-// SUSPENSE İÇİN OLUŞTURULAN AYRI COMPONENT:
+
+// SUSPENSE İÇİN OLUŞTURULAN AYRI COMPONENT (HEADER İÇİN):
+async function FilterHeader({year, month}) {
+    //links ile ilgili olan her şey buraya taşındı:
+    
+    const availableYears = await getAvailableNewsYears();
+    let links = availableYears;
+        
+
+    // SQL'den çekilen data STRING olduğu için aşağıdaki IF statement'da +selectedYear 
+    // diyerek Number'a çevirmeye gerek yok. aynı şekilde +selectedMonth a da gerek yok.
+    if((year && !availableYears.includes(year)) // url'e yanlış yıl girildiyse
+        ||
+       (month && !getAvailableNewsMonths(year).includes(month)) // url'e yanlış ay girildiyse
+    ){    
+        throw new Error("Invalid filter!");
+    }
+ 
+    if(year && !month){
+         // o yıla ait article ların ayları
+         links = getAvailableNewsMonths(year);
+    }
+    
+    if(year && month){
+        // news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
+        links = [];
+    } 
+    
+    return(
+        <header id="archive-header">
+            <nav>
+                <ul>
+                    {links.map((link) => 
+                    {
+                        // seçili yıl varsa o yıl içnde seçilebilecek ayları göster.
+                        // seçili yıl yoksa direk yılları göster. default links = yıllar
+                        const href = year ? `/archive/${year}/${link}` : `/archive/${link}`;
+                        return(
+                            <li key={link}>
+                                <Link href={href}>{link}</Link>
+                            </li>
+                        )}
+                    )}
+                </ul>
+            </nav>
+        </header>
+    )
+}
+
+
+
+// SUSPENSE İÇİN OLUŞTURULAN AYRI COMPONENT (NEWS İÇİN):
 async function FilteredNews({year, month}){
     //news ile ilgili olan her şey buraya taşındı:
     let news;
@@ -38,53 +89,13 @@ export default async function FilteredNewsPage({params}){
         selectedMonth = undefined;
     }
     
-    const availableYears = await getAvailableNewsYears();
-    let links = availableYears;
-    
-    
-    if(selectedYear && !selectedMonth){
-        // o yıla ait article ların ayları
-        links = getAvailableNewsMonths(selectedYear);
-    }
 
-    if(selectedYear && selectedMonth){
-        // news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
-        links = [];
-    } 
-        
-
-    // SQL'den çekilen data STRING olduğu için aşağıdaki IF statement'da +selectedYear 
-    // diyerek Number'a çevirmeye gerek yok. aynı şekilde +selectedMonth a da gerek yok.
-    if(
-       (selectedYear && !availableYears.includes(selectedYear)) // url'e yanlış yıl girildiyse
-       ||
-       (selectedMonth && !getAvailableNewsMonths(selectedYear).includes(selectedMonth)) // url'e yanlış ay girildiyse
-    ){    
-        throw new Error("Invalid filter!");
-    }
 
     return(
         <>
-        <header id="archive-header">
-            <nav>
-                <ul>
-                    {/* links */}
-                    {links.map((link) => 
-                    {
-                        // seçili yıl varsa o yıl içnde seçilebilecek ayları göster.
-                        // seçili yıl yoksa direk yılları göster. default links = yıllar
-                        const href = selectedYear ? `/archive/${selectedYear}/${link}` : `/archive/${link}`;
-                    
-                        return(
-                            <li key={link}>
-                                <Link href={href}>{link}</Link>
-                            </li>
-                        )
-                    }
-                    )}
-                </ul>
-            </nav>
-        </header>
+        <Suspense fallback={<p>Loading filter...</p>}>
+            <FilterHeader year={selectedYear} month={selectedMonth}/>
+        </Suspense>
 
         {/* {newsContent} */}
         <Suspense fallback={<p>Loading news...</p>}>
