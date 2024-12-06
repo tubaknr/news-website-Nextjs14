@@ -1,13 +1,13 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { DUMMY_NEWS } from "@/dummy_news";
+// import { DUMMY_NEWS } from "@/dummy_news";
+import ModalBackdrop from "@/components/modal-backdrop";
 import { notFound } from "next/navigation";
+import { getNewsItem } from "@/lib/news";
 
-export default function interceptedImagePage({params}){
-    const router = useRouter();
 
+export default async function interceptedImagePage({params}){
     const newsItemSlug = params.newsSlug;
-    const newsItem = DUMMY_NEWS.find((news) => news.slug === newsItemSlug);
+    // const newsItem = DUMMY_NEWS.find((news) => news.slug === newsItemSlug);
+    const newsItem = await getNewsItem(newsItemSlug);
 
     if(!newsItem){
         notFound();
@@ -15,9 +15,14 @@ export default function interceptedImagePage({params}){
 
     return(
         <>
-        <div className="modal-backdrop" onClick={router.back}/>
+        {/* AŞAĞIDAKİ DIV'İ AYRI BİR COMP YAPARAK BU SAYFAYI SERVER-SIDE YAPABİLİR 
+        VE SERVER-SIDE YAPINCA (YAVAŞ BACKEND'DEN DOLAYI AWAIT OALCAĞI İÇİN)
+         ASYNC-AWAIT YAPABİLİRİZ */}
+
+        <ModalBackdrop />
         <dialog className="modal" open>
             <div className="fullscreen-image">
+                <p>Intercepted image page!!</p>
                 <img src={`/images/news/${newsItem.image}`} 
                      alt={newsItem.slug}/>
 

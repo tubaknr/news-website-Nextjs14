@@ -5,7 +5,7 @@ import Link from "next/link";
 export default async function NewsDetailPage({params}){
     const newsItemSlug = params.newsSlug;
     // const newsItem = DUMMY_NEWS.find(newsItem => newsItem.slug === newsItemSlug);
-    const newsItem = await getNewsItem(newsSlug)
+    const newsItem = await getNewsItem(newsItemSlug)
 
 
     if (!newsItem){
